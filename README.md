@@ -34,9 +34,16 @@ Os projetos abrangem desde o desenvolvimento de aplicações Full-Stack até a c
 
 Aqui estão alguns registros das soluções em funcionamento:
 
-| Dashboard de Inteligência | Tela de Login | Sistema Interno |
-|:---:|:---:|:---:|
-| ![Dashboard](./img/dashboard.png) | ![Login](./img/login.jpg) | ![Formulario](./img/formulario.jpg) |
+### 📸 Demonstração das Interfaces
+
+#### 📊 Dashboard de Inteligência
+![Dashboard](./img/dashboard.png)
+
+#### 🔐 Tela de Login
+![Login](./img/login.jpg)
+
+#### 📝 Sistema Interno (Formulário)
+![Formulario](./img/formulario.jpg)
 
 > *Nota: As interfaces foram projetadas para oferecer uma experiência intuitiva, transformando dados complexos em indicadores visuais para tomada de decisão.*
 
