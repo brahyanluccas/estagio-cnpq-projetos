@@ -30,13 +30,13 @@ Os projetos abrangem desde o desenvolvimento de aplicações Full-Stack até a c
 
 ---
 
-## 📸 Demonstração das Interfaces
+### 📸 Demonstração das Interfaces
 
-Aqui estão alguns registros das soluções em funcionamento, focando em usabilidade e visualização de dados:
+Aqui estão alguns registros das soluções em funcionamento:
 
-| Dashboard de Inteligência de Dados | Sistema de Gestão (Full-Stack) |
-|:---:|:---:|
-| ![Dashboard](./img/dashboard.png) | ![Login](./img/login.png) |
+| Dashboard de Inteligência | Tela de Login | Sistema Interno |
+|:---:|:---:|:---:|
+| ![Dashboard](./img/dashboard.png) | ![Login](./img/login.jpg) | ![Formulario](./img/formulario.jpg) |
 
 > *Nota: As interfaces foram projetadas para oferecer uma experiência intuitiva, transformando dados complexos em indicadores visuais para tomada de decisão.*
 
