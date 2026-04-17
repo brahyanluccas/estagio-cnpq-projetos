@@ -30,6 +30,16 @@ Os projetos abrangem desde o desenvolvimento de aplicações Full-Stack até a c
 
 ---
 
+## 📸 Demonstração das Interfaces
+
+Aqui estão alguns registros das soluções em funcionamento, focando em usabilidade e visualização de dados:
+
+| Dashboard de Inteligência de Dados | Sistema de Gestão (Full-Stack) |
+|:---:|:---:|
+| ![Dashboard](./img/dashboard.png) | ![Login](./img/login.png) |
+
+> *Nota: As interfaces foram projetadas para oferecer uma experiência intuitiva, transformando dados complexos em indicadores visuais para tomada de decisão.*
+
 ## 🛠️ Competências Desenvolvidas
 - **Linguagens:** Python (Back-end), HTML5, CSS3, JavaScript (Front-end).
 - **Frameworks:** Flask, SQLAlchemy, Jinja2.
