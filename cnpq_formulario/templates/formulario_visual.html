@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>Relatório de Monitoramento INCT</title>
+    <style>
+        /* --- ESTILOS FOCADOS EM IMPRESSÃO E PDF --- */
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333;
+            font-size: 10pt;
+            line-height: 1.4;
+            background-color: white;
+            /* Força a impressão das cores de fundo */
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Cabeçalho do Relatório */
+        .header-report {
+            text-align: center;
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .header-report h1 {
+            color: #0d6efd;
+            font-size: 16pt;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+
+        .header-report p {
+            margin: 0;
+            color: #555;
+            font-size: 10pt;
+        }
+
+        /* Seções Principais (Tarjas Azuis) */
+        .section-title {
+            background-color: #0d6efd;
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 12pt;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            page-break-after: avoid;
+        }
+
+        /* Subseções */
+        .subsection-title {
+            color: #0d6efd;
+            font-weight: bold;
+            font-size: 10.5pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 4px;
+            page-break-after: avoid;
+        }
+
+        /* Componentes de Texto/Grid */
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .info-row {
+            display: table-row;
+        }
+        .info-cell {
+            display: table-cell;
+            padding: 8px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .info-row:last-child .info-cell {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            width: 35%;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+        }
+
+        /* Tabelas Padrão */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 9pt;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-weight: bold;
+        }
+        
+        /* Regras de Quebra de Página (Crucial para PDFs) */
+        tr { page-break-inside: avoid; }
+        thead { display: table-header-group; }
+        .page-break { page-break-before: always; }
+
+        .no-data {
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;
+            background-color: #fdfdfd;
+            padding: 10px;
+        }
+
+        .badge-like {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 8pt;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            color: #495057;
+            margin-right: 4px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="header-report">
+            {% if logo_base64 %}
+            <div style="position: absolute; right: 0; top: 0;">
+                <img src="{{ logo_base64 }}" alt="Logo CNPq" style="max-height: 70px; width: auto;">
+            </div>
+            {% endif %}
+            <h1>Relatório de Monitoramento dos INCTs</h1>
+            <p>Conselho Nacional de Desenvolvimento Científico e Tecnológico - CNPq</p>
+            <p style="font-size: 8pt; margin-top: 10px; color: #888;">Documento gerado eletronicamente em: {{ data_geracao }}</p>
+        </div>
+
+        <div class="section-title">1. Identificação do Projeto</div>
+        <div class="info-grid">
+            <div class="info-row"><div class="info-cell info-label">Nome do INCT:</div><div class="info-cell">{{ dados.nome_projeto | default('Não informado', true) }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">Sigla:</div><div class="info-cell">{{ dados.sigla | default('Não informado', true) }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">Processo nº:</div><div class="info-cell">{{ processo_formatado | default('Não informado', true) }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">Chamada Pública:</div><div class="info-cell">CNPq/INCT nº 58/2022</div></div>
+            <div class="info-row"><div class="info-cell info-label">Coordenador(a) Geral:</div><div class="info-cell">{{ coordenador | default('Não informado', true) }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">Instituição Sede:</div><div class="info-cell">{{ dados.instituicao_sede | default('Não informado', true) }}</div></div>
+        </div>
+
+        <div class="section-title">2. Perfil do INCT - Composição da Rede</div>
+        
+        <div class="subsection-title">2.1) Alterações na Composição da Rede (Equipe)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Membro</th>
+                    <th>Função / Titulação</th>
+                    <th>Área de Atuação</th>
+                    <th>Instituição / Localidade</th>
+                    <th>Status Informado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for membro in membros_equipe %}
+                <tr>
+                    <td><strong>{{ membro.nome }}</strong></td>
+                    <td>{{ membro.categoria }}<br><span style="color:#6c757d; font-size:8pt;">{{ membro.titulacao }}</span></td>
+                    <td>{{ membro.area_atuacao }}</td>
+                    <td>{{ membro.instituicao }}<br><span style="color:#6c757d; font-size:8pt;">{{ membro.pais }} ({{ membro.uf }})</span></td>
+                    <td>
+                        {% if membro.status_atual %}<span class="badge-like">Original</span>{% endif %}
+                        {% if membro.status_novo %}<span class="badge-like" style="background:#d1e7dd; color:#0f5132;">Novo</span>{% endif %}
+                        {% if membro.status_excluido %}<span class="badge-like" style="background:#f8d7da; color:#842029;">Excluído</span>{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="no-data">Nenhum membro listado na equipe.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">2.2) Articulações e Parcerias com Órgãos ou Organizações Sociais</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:30%;">Instituição</th>
+                    <th style="width:20%;">Natureza / Classificação</th>
+                    <th style="width:25%;">Localidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for org in organizacoes_parceiras %}
+                <tr>
+                    <td><strong>{{ org.nome }}</strong></td>
+                    <td>{{ org.natureza }}<br><span style="color:#6c757d; font-size:8pt;">{{ org.classificacao }}</span></td>
+                    <td>{{ org.cidade }} - {{ org.uf }}<br><span style="color:#6c757d; font-size:8pt;">{{ org.pais }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="no-data">Nenhuma organização parceira informada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="section-title">3. Aspectos Gerenciais</div>
+        
+        <div class="subsection-title">3.1) Execução Financeira (Gasto Reportado)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fonte / Agência</th>
+                    <th>Custeio (R$)</th>
+                    <th>Capital (R$)</th>
+                    <th>Bolsas no País (R$)</th>
+                    <th>Quotas Ext.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>CNPq/FNDCT</strong></td>
+                    <td>{{ "{:,.2f}".format(dados.cnpq_custeio_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ "{:,.2f}".format(dados.cnpq_capital_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ "{:,.2f}".format(dados.cnpq_bolsas_pais_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td style="text-align:center;">{{ dados.cnpq_bolsas_ext_gasto }}</td>
+                </tr>
+                <tr>
+                    <td><strong>CAPES</strong></td>
+                    <td>{{ "{:,.2f}".format(dados.capes_custeio_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ "{:,.2f}".format(dados.capes_capital_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ "{:,.2f}".format(dados.capes_bolsas_pais_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td style="text-align:center;">{{ dados.capes_bolsas_ext_gasto }}</td>
+                </tr>
+                <tr>
+                    <td><strong>FAPs</strong></td>
+                    <td>{{ "{:,.2f}".format(dados.faps_custeio_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ "{:,.2f}".format(dados.faps_capital_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ "{:,.2f}".format(dados.faps_bolsas_pais_gasto | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td style="text-align:center;">{{ dados.faps_bolsas_ext_gasto }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="subsection-title">3.2) Captação de Recursos Externos (Alavancagem)</div>
+        {% if dados.houve_alavancagem == 'Sim' %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Fonte/Instituição</th>
+                    <th>Tipo de Recurso</th>
+                    <th>Natureza da Fonte</th>
+                    <th>Valor Aportado (R$)</th>
+                    <th>Período</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rec in recursos_alavancados %}
+                <tr>
+                    <td><strong>{{ rec.fonte }}</strong></td>
+                    <td>{{ rec.tipo_recurso }}</td>
+                    <td>{{ rec.natureza_fonte }}</td>
+                    <td>{{ "{:,.2f}".format(rec.valor | float).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                    <td>{{ rec.periodo_aporte }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-data" style="border: 1px solid #dee2e6;">O INCT declarou não ter captado recursos externos provenientes de outras fontes.</p>
+        {% endif %}
+
+        <div class="subsection-title">3.3) Avaliação de Infraestrutura e Apoio</div>
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-cell info-label">3.3.1) Infraestrutura da Instituição Sede:</div>
+                <div class="info-cell">
+                    <strong>Grau de Satisfação (1 a 5):</strong> {{ dados.avaliacao_sede | default('Não avaliado nesta etapa', true) }}
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-cell info-label">3.3.2) Infraestrutura de Laboratórios Parceiros:</div>
+                <div class="info-cell">
+                    <strong>Grau de Satisfação (1 a 5):</strong> {{ dados.avaliacao_parceiras | default('Não avaliado nesta etapa', true) }}
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-cell info-label">Comentários e Justificativa:</div>
+                <div class="info-cell" style="text-align: justify;">
+                    {{ dados.avaliacao_comentarios | default('Nenhum comentário adicional registrado.', true) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+        <div class="section-title">4. Resultados por Diretrizes</div>
+
+        <div class="subsection-title">4.1) Mobilização e Articulação de Redes (Outros INCTs)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:30%;">INCT Articulado</th>
+                    <th style="width:25%;">Coordenador(a)</th>
+                    <th style="width:30%;">Objetivo / Natureza</th>
+                    <th style="width:15%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for art in articulacoes_incts %}
+                <tr>
+                    <td><strong>{{ art.inct_nome }}</strong><br><span style="color:#6c757d; font-size:8pt;">{{ art.grande_area }}</span></td>
+                    <td>{{ art.coordenador }}</td>
+                    <td>{{ art.objetivo }}<br><span style="color:#6c757d; font-size:8pt;">{{ art.natureza }}</span></td>
+                    <td class="text-center">{{ art.status }}<br><span style="color:#6c757d; font-size:8pt;">{{ art.formalizacao }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhuma articulação com outro INCT reportada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.2.1) Produção Bibliográfica Validada</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Categoria / Tipo</th>
+                    <th style="width:45%;">Título da Publicação</th>
+                    <th style="width:20%;">Autores</th>
+                    <th style="width:10%; text-align:center;">Ano</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bib in prod_biblio %}
+                <tr>
+                    <td>{{ bib.categoria }}<br>{% if bib.internacional == 'Sim' %}<span class="badge-like">Coautoria Intl.</span>{% endif %}</td>
+                    <td><strong>{{ bib.titulo }}</strong></td>
+                    <td>{{ bib.autor }}</td>
+                    <td style="text-align:center;">{{ bib.ano }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhuma produção bibliográfica validada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.2.2) Produção Técnica Validada</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Categoria / Tipo</th>
+                    <th style="width:45%;">Título do Trabalho</th>
+                    <th style="width:20%;">Pesquisador</th>
+                    <th style="width:10%; text-align:center;">Ano</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tec in prod_tecnica %}
+                <tr>
+                    <td>{{ tec.categoria }}</td>
+                    <td><strong>{{ tec.titulo }}</strong></td>
+                    <td>{{ tec.pesquisador }}</td>
+                    <td style="text-align:center;">{{ tec.ano }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhuma produção técnica validada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.2.3) Produção Artística/Cultural Validada</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Categoria / Tipo</th>
+                    <th style="width:45%;">Título da Obra</th>
+                    <th style="width:20%;">Autor</th>
+                    <th style="width:10%; text-align:center;">Ano</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for art in prod_artistica %}
+                <tr>
+                    <td>{{ art.categoria }}</td>
+                    <td><strong>{{ art.titulo }}</strong></td>
+                    <td>{{ art.autor }}</td>
+                    <td style="text-align:center;">{{ art.ano }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhuma produção artística validada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.2.4) Resultados de Inovação e com Potencial Inovador</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:20%;">Categoria</th>
+                    <th style="width:40%;">Título do Registro / Produto</th>
+                    <th style="width:10%; text-align:center;">Ano</th>
+                    <th style="width:15%;">Escopo</th>
+                    <th style="width:15%;">Países Envolvidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inov in prod_inovacao %}
+                <tr>
+                    <td><strong>{{ inov.categoria }}</strong></td>
+                    <td>{{ inov.titulo }}</td>
+                    <td style="text-align:center;">{{ inov.ano }}</td>
+                    <td>{{ inov.escopo }}</td>
+                    <td>{{ inov.paises_colaboracao | default('-', true) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="no-data">Nenhum resultado de inovação validado nesta etapa.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="page-break"></div>
+
+        <div class="subsection-title">4.3.1) Projetos Desenvolvidos em Parceria com Empresas</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:20%;">Natureza / Categoria</th>
+                    <th style="width:40%;">Título do Projeto</th>
+                    <th style="width:10%; text-align:center;">Ano</th>
+                    <th style="width:15%;">Escopo</th>
+                    <th style="width:15%;">Países Envolvidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proj in projetos_cooperacao %}
+                <tr>
+                    <td><strong>{{ proj.natureza }}</strong></td>
+                    <td>{{ proj.titulo }}</td>
+                    <td style="text-align:center;">{{ proj.ano }}</td>
+                    <td>{{ proj.escopo }}</td>
+                    <td>{{ proj.paises_colaboracao | default('-', true) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="no-data">Nenhum projeto desenvolvido em parceria validado nesta etapa.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.3.2) Parceria com Empresas Nacionais e Estrangeiras</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Empresa / Localidade</th>
+                    <th style="width:25%;">Tipo de Interação</th>
+                    <th style="width:30%;">Objetivo / Escopo</th>
+                    <th style="width:20%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in empresas_nacionais %}
+                <tr>
+                    <td><strong>{{ emp.nome }}</strong><br><span style="color:#6c757d; font-size:8pt;">CNPJ: {{ emp.cnpj }}<br>Brasil ({{ emp.uf }})</span></td>
+                    <td>{{ emp.tipo_interacao }}</td>
+                    <td>{{ emp.objetivo }}</td>
+                    <td>{{ emp.formalizacao }}</td>
+                </tr>
+                {% endfor %}
+                {% for emp in empresas_estrangeiras %}
+                <tr>
+                    <td><strong>{{ emp.nome }}</strong><br><span style="color:#6c757d; font-size:8pt;">Exterior ({{ emp.pais }})</span></td>
+                    <td>{{ emp.tipo_interacao }}</td>
+                    <td>{{ emp.objetivo }}</td>
+                    <td>{{ emp.formalizacao }}</td>
+                </tr>
+                {% endfor %}
+                {% if not empresas_nacionais and not empresas_estrangeiras %}
+                <tr><td colspan="4" class="no-data">Nenhuma parceria com empresas registrada.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.3.3) Contratos de Transferência de Tecnologia</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Empresa Relacionada</th>
+                    <th style="width:25%;">Tipo de Acordo</th>
+                    <th style="width:30%;">Finalidade</th>
+                    <th style="width:20%;">Vigência / Contrapartida</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cont in contratos_tecnologia %}
+                <tr>
+                    <td><strong>{{ cont.empresa }}</strong><br><span style="color:#6c757d; font-size:8pt;">{{ cont.pais }} ({{ cont.uf }})</span></td>
+                    <td>{{ cont.tipo_acordo }}</td>
+                    <td>{{ cont.finalidade }}</td>
+                    <td>Vigência: {{ cont.vigencia }}<br>Valor: R$ {{ cont.contrapartida_financeira }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhum contrato de transferência de tecnologia registrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.3.4) Contratos e Acordos de Confidencialidade (NDA)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Empresa</th>
+                    <th style="width:25%;">Localização</th>
+                    <th style="width:30%;">Vigência</th>
+                    <th style="width:20%;">Vinculado a Contrato?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nda in acordos_nda %}
+                <tr>
+                    <td><strong>{{ nda.empresa }}</strong></td>
+                    <td>{{ nda.localizacao }}</td>
+                    <td>{{ nda.vigencia }}</td>
+                    <td style="text-align:center;">{{ nda.vinculado_contrato }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhum Acordo de Confidencialidade (NDA) registrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.4) Formação de Recursos Humanos (Validados)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:30%;">Orientando</th>
+                    <th style="width:30%;">Orientador (Membro INCT)</th>
+                    <th style="width:25%;">Nível / Tipo</th>
+                    <th style="width:15%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rh in formacao_rh %}
+                <tr>
+                    <td><strong>{{ rh.orientando }}</strong></td>
+                    <td>{{ rh.orientador }}</td>
+                    <td>{{ rh.tipo }}<br><span style="color:#6c757d; font-size:8pt;">{{ rh.subtipo }}</span></td>
+                    <td>{% if 'Andamento' in rh.tipo or 'andamento' in rh.tipo or 'andamento' in rh.subtipo %}Em Andamento{% else %}Concluído{% endif %}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="no-data">Nenhuma formação de RH validada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="subsection-title">4.5) Divulgação e Popularização da CT&I</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:25%;">Atividade / Veículo</th>
+                    <th style="width:45%;">Descrição da Ação</th>
+                    <th style="width:30%;">Público Alvo / Abrangência</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for div in atividades_divulgacao %}
+                <tr>
+                    <td><strong>{{ div.tipo }}</strong></td>
+                    <td>{{ div.titulo }}</td>
+                    <td>{{ div.publico }}<br><span style="color:#6c757d; font-size:8pt;">Abrangência: {{ div.escopo }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="no-data">Nenhuma ação de divulgação reportada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="page-break"></div>
+        <div class="subsection-title">4.6) Visibilidade e Cooperação Internacional</div>
+        
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.1) Produção Bibliográfica em Coautoria Internacional</p>
+        <table>
+            <thead><tr><th>Título da Publicação</th><th>Categoria</th><th>Países Envolvidos</th></tr></thead>
+            <tbody>
+                {% set tem_bib_int = false %}
+                {% for bib in prod_biblio %}
+                    {% if bib.internacional == 'Sim' %}
+                        {% set tem_bib_int = true %}
+                        <tr><td>{{ bib.titulo }}</td><td>{{ bib.categoria }}</td><td>{{ bib.paises_colaboracao }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_bib_int %}<tr><td colspan="3" class="no-data">Nenhuma produção bibliográfica internacional validada.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.2) Produção Técnica Internacional</p>
+        <table>
+            <thead><tr><th>Título / Trabalho</th><th>Categoria</th><th>País Relacionado</th></tr></thead>
+            <tbody>
+                {% set tem_tec_int = false %}
+                {% for tec in prod_tecnica %}
+                    {% if tec.abrangencia == 'Exterior' %}
+                        {% set tem_tec_int = true %}
+                        <tr><td>{{ tec.titulo }}</td><td>{{ tec.categoria }}</td><td>{{ tec.pais_colaboracao }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_tec_int %}<tr><td colspan="3" class="no-data">Nenhuma produção técnica internacional validada.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.3) Produção Artística/Cultural Internacional</p>
+        <table>
+            <thead><tr><th>Título da Obra</th><th>Categoria</th><th>Países Envolvidos</th></tr></thead>
+            <tbody>
+                {% set tem_art_int = false %}
+                {% for art in prod_artistica %}
+                    {% if art.internacional == 'Sim' %}
+                        {% set tem_art_int = true %}
+                        <tr><td>{{ art.titulo }}</td><td>{{ art.categoria }}</td><td>{{ art.paises_colaboracao }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_art_int %}<tr><td colspan="3" class="no-data">Nenhuma produção artística internacional validada.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.4) Resultados de Inovação e com Potencial Inovador Internacional</p>
+        <table>
+            <thead><tr><th>Título do Registro / Produto</th><th>Categoria</th><th>Países Envolvidos</th></tr></thead>
+            <tbody>
+                {% set tem_inov_int = false %}
+                {% for inov in prod_inovacao %}
+                    {% if inov.escopo == 'Internacional' %}
+                        {% set tem_inov_int = true %}
+                        <tr><td>{{ inov.titulo }}</td><td>{{ inov.categoria }}</td><td>{{ inov.paises_colaboracao }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_inov_int %}<tr><td colspan="3" class="no-data">Nenhum resultado de inovação internacional registrado.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.5) Projetos Internacionais Desenvolvidos em Parceria com Empresas</p>
+        <table>
+            <thead><tr><th>Título do Projeto</th><th>Empresa Parceira</th><th>Países Envolvidos</th></tr></thead>
+            <tbody>
+                {% set tem_proj_int = false %}
+                {% for proj in projetos_cooperacao %}
+                    {% if proj.escopo == 'Internacional' %}
+                        {% set tem_proj_int = true %}
+                        <tr><td>{{ proj.titulo }}</td><td>{{ proj.natureza }}</td><td>{{ proj.paises_colaboracao }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_proj_int %}<tr><td colspan="3" class="no-data">Nenhum projeto de parceria internacional validado.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.6) Parcerias com Empresas Estrangeiras</p>
+        <table>
+            <thead><tr><th>Empresa Estrangeira</th><th>País</th><th>Tipo de Interação</th></tr></thead>
+            <tbody>
+                {% for emp in empresas_estrangeiras %}
+                <tr><td><strong>{{ emp.nome }}</strong></td><td>{{ emp.pais }}</td><td>{{ emp.tipo_interacao }}</td></tr>
+                {% else %}<tr><td colspan="3" class="no-data">Nenhuma parceria com empresa estrangeira registrada.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.7) Contratos Internacionais de Transferência de Tecnologia</p>
+        <table>
+            <thead><tr><th>Empresa Relacionada</th><th>País</th><th>Tipo de Acordo</th></tr></thead>
+            <tbody>
+                {% set tem_cont_int = false %}
+                {% for cont in contratos_tecnologia %}
+                    {% if cont.pais and cont.pais != 'Brasil' %}
+                        {% set tem_cont_int = true %}
+                        <tr><td><strong>{{ cont.empresa }}</strong></td><td>{{ cont.pais }}</td><td>{{ cont.tipo_acordo }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_cont_int %}<tr><td colspan="3" class="no-data">Nenhum contrato internacional registrado.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.8) Contratos e Acordos Internacionais de Confidencialidade (NDAs)</p>
+        <table>
+            <thead><tr><th>Empresa</th><th>País / Localização</th><th>Vigência</th></tr></thead>
+            <tbody>
+                {% set tem_nda_int = false %}
+                {% for nda in acordos_nda %}
+                    {% if nda.localizacao and nda.localizacao != 'Brasil' %}
+                        {% set tem_nda_int = true %}
+                        <tr><td><strong>{{ nda.empresa }}</strong></td><td>{{ nda.localizacao }}</td><td>{{ nda.vigencia }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_nda_int %}<tr><td colspan="3" class="no-data">Nenhum NDA internacional registrado.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.9) Formação de Recursos Humanos Internacional</p>
+        <table>
+            <thead><tr><th>Orientando</th><th>Orientador</th><th>Nível / Instituição Estrangeira</th></tr></thead>
+            <tbody>
+                {% set tem_rh_int = false %}
+                {% for rh in formacao_rh %}
+                    {% if rh.pais and rh.pais != 'Brasil' and rh.pais != '' %}
+                        {% set tem_rh_int = true %}
+                        <tr><td><strong>{{ rh.orientando }}</strong></td><td>{{ rh.orientador }}</td><td>{{ rh.tipo }}<br><span style="color:#6c757d; font-size:8pt;">{{ rh.pais }}</span></td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_rh_int %}<tr><td colspan="3" class="no-data">Nenhuma formação de RH internacional registrada.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.10) Integrantes Estrangeiros da Equipe do INCT</p>
+        <table>
+            <thead><tr><th>Nome do Membro</th><th>Categoria</th><th>Instituição / País</th></tr></thead>
+            <tbody>
+                {% set tem_mem_int = false %}
+                {% for membro in membros_equipe %}
+                    {% if membro.pais and membro.pais != 'Brasil' and membro.pais != '' %}
+                        {% set tem_mem_int = true %}
+                        <tr><td><strong>{{ membro.nome }}</strong></td><td>{{ membro.categoria }}</td><td>{{ membro.instituicao }} ({{ membro.pais }})</td></tr>
+                    {% endif %}
+                {% endfor %}
+                {% if not tem_mem_int %}<tr><td colspan="3" class="no-data">Nenhum membro estrangeiro listado na equipe.</td></tr>{% endif %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.11) Cooperação Acadêmica Internacional Institucionalizada</p>
+        <table>
+            <thead><tr><th>Instituição Estrangeira</th><th>País</th><th>Tipo de Interação</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for coop in acordos_cooperacao %}
+                <tr><td><strong>{{ coop.instituicao }}</strong></td><td>{{ coop.pais }}</td><td>{{ coop.tipo_interacao }}</td><td>{{ coop.status }}</td></tr>
+                {% else %}<tr><td colspan="4" class="no-data">Nenhum acordo de cooperação internacional formal reportado.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+
+        <p style="font-size: 9.5pt; font-weight: bold; color: #495057; margin-bottom: 5px; margin-top: 15px;">4.6.12) Ações de Divulgação de Alcance Internacional</p>
+        <table>
+            <thead><tr><th>Veículo / Atividade</th><th>Descrição da Ação</th></tr></thead>
+            <tbody>
+                {% for div_int in divulgacao_internacional %}
+                <tr><td><strong>{{ div_int.titulo }}</strong></td><td>{{ div_int.descricao }}</td></tr>
+                {% else %}<tr><td colspan="2" class="no-data">Nenhuma atividade de divulgação internacional validada.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+
+        <div class="page-break"></div>
+        <div class="section-title">5. Alcance de Metas e Objetivos</div>
+        
+        <p style="margin-bottom: 15px; font-size: 10pt;">Percentual de execução reportado pelo coordenador para cada meta vinculada ao projeto.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%; text-align:center;">Nº da Meta</th>
+                    <th style="width: 70%;">Descrição da Evolução / Progresso</th>
+                    <th style="width: 15%; text-align:center;">Avanço (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for meta in metas_progresso %}
+                <tr>
+                    <td style="text-align:center; font-weight:bold; font-size: 11pt;">{{ meta.id }}</td>
+                    <td>{{ meta.descricao }}</td>
+                    <td style="text-align:center; font-weight:bold; color: #0d6efd; font-size: 11pt;">{{ meta.progresso }}%</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="no-data">Nenhum progresso de meta atualizado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="section-title">6. Principais Resultados Alcançados</div>
+        
+        {% if resultados_propostos %}
+            {% for res in resultados_propostos %}
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-cell" style="background-color: #f8f9fa; padding: 10px; border-bottom: 1px solid #ddd;">
+                        <strong>Resultado Descrito:</strong>
+                        <p style="margin-top: 5px; margin-bottom: 0; text-align: justify;">{{ res.descricao }}</p>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-cell" style="font-size: 8.5pt; color: #555;">
+                        <span class="badge-like">Contexto: {{ res.contexto }}</span>
+                        <span class="badge-like">Dimensão: {{ res.dimensoes }}</span>
+                        <span class="badge-like">Produtos: {{ res.produtos }}</span><br>
+                        <strong style="margin-top: 4px; display: inline-block;">Objetivos Vinculados (IDs):</strong> {{ res.metas }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data" style="border: 1px solid #dee2e6;">Nenhum resultado qualitativo foi detalhado para este período.</p>
+        {% endif %}
+
+        <div class="section-title">7. Governança, Gestão e Avaliação do Programa</div>
+        
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-cell info-label">Dificuldades Encontradas:</div>
+                <div class="info-cell" style="text-align: justify;">
+                    {% if dados.dificuldades_encontradas %}
+                        {{ dados.dificuldades_encontradas }}
+                    {% else %}
+                        <span style="color:#6c757d; font-style:italic;">Nenhuma dificuldade adicional relatada pelo coordenador.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-cell info-label">Sugestões de Aprimoramento:</div>
+                <div class="info-cell" style="text-align: justify;">
+                    {% if dados.sugestoes_aprimoramento %}
+                        {{ dados.sugestoes_aprimoramento }}
+                    {% else %}
+                        <span style="color:#6c757d; font-style:italic;">Nenhuma sugestão registrada nesta etapa.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-cell info-label">Resumo do Projeto para o Público (Linguagem Leiga):</div>
+                <div class="info-cell" style="text-align: justify;">
+                    {% if dados.divulgacao_leigos %}
+                        {{ dados.divulgacao_leigos }}
+                    {% else %}
+                        <span style="color:#6c757d; font-style:italic;">Nenhum texto de divulgação pública redigido.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">8. Autorização de Compartilhamento</div>
+        <div style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 4px;">
+            <p style="margin-top: 0; font-weight: bold; color: #495057;">O Coordenador autorizou o compartilhamento dos dados deste relatório com os seguintes públicos/entidades:</p>
+            {% if autorizacoes %}
+                <ul style="margin-bottom: 0; color: #333;">
+                {% for aut in autorizacoes %}
+                    <li>{{ aut }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p style="margin-bottom: 0; color: #dc3545; font-weight: bold;">Nenhuma autorização selecionada.</p>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; padding-top: 15px; font-size: 8pt; color: #999; border-top: 1px solid #ddd;">
+            <p style="margin: 0;">Relatório gerado através do Sistema de Monitoramento INCT</p>
+            <p style="margin: 0;">Conselho Nacional de Desenvolvimento Científico e Tecnológico - CNPq</p>
+        </div>
+
+    </div>
+</body>
+</html>
