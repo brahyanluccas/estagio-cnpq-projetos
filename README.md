@@ -34,8 +34,6 @@ Os projetos abrangem desde o desenvolvimento de aplicações Full-Stack até a c
 
 Aqui estão alguns registros das soluções em funcionamento:
 
-### 📸 Demonstração das Interfaces
-
 #### 📊 Dashboard de Inteligência
 ![Dashboard](./img/dashboard.png)
 
