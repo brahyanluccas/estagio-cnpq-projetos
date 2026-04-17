@@ -43,4 +43,4 @@ Os projetos abrangem desde o desenvolvimento de aplicações Full-Stack até a c
 Cada pasta possui seu próprio arquivo de código e, em alguns casos, documentação específica. Para rodar qualquer automação, certifique-se de ter o Python 3.12+ instalado e as dependências do arquivo `requirements.txt` da raiz.
 
 ---
-**Contato:** [Brahyan Luccas](https://www.linkedin.com/in/brahyan-luccas-pereira-nunes-de-souza-03b87a25a/)
+**Contato:** [Brahyan Luccas](https://www.linkedin.com/in/brahyan-luccas)
